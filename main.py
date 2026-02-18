@@ -9,7 +9,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = FastAPI()
-client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = AsyncOpenAI(
+    api_key=os.getenv("AIPIPE_TOKEN"),
+    base_url="https://aipipe.org/openai/v1"   # ← points to AI Pipe instead of OpenAI
+)
+
 
 @app.post("/stream")
 async def stream_response(request: Request):
