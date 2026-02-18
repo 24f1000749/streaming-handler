@@ -5,6 +5,26 @@ from fastapi import FastAPI, Request
 from fastapi.responses import StreamingResponse
 from openai import AsyncOpenAI
 from dotenv import load_dotenv
+import asyncio
+import httpx
+import os
+
+@app.on_event("startup")
+async def keep_warm():
+    asyncio.create_task(_ping_self())
+
+async def _ping_self():
+    await asyncio.sleep(60)  # wait for server to fully start
+    url = os.getenv("RENDER_EXTERNAL_URL", "")
+    if not url:
+        return
+    async with httpx.AsyncClient() as client:
+        while True:
+            try:
+                await client.get(f"{url}/")
+            except:
+                pass
+            await asyncio.sleep(840)  # ping every 14 minutes
 
 load_dotenv()
 
